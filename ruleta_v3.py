@@ -471,13 +471,15 @@ while ejecutando:
         rect_texto = texto_resultado.get_rect(center=((ANCHO // 3) - (ANCHO // 6), centro[1]))
         pantalla.blit(texto_resultado, rect_texto)
         
-        # Imagen del ganador
+        # Imagen del ganador - posicionada exactamente en la mitad derecha de la pantalla
         indice_imagen = opciones_disponibles.index(ganador_actual)
-        imagen_ganador = pygame.transform.scale(imagenes[indice_imagen], (160, 160))
-        rect_imagen = imagen_ganador.get_rect(center=(ANCHO // 2 + (ANCHO // 6), centro[1]))
+        imagen_ganador = pygame.transform.scale(imagenes[indice_imagen], (200, 200))  # Ligeramente más grande
+        # Calcular centro de la mitad derecha: desde x=640 hasta x=1280, centro en x=960
+        centro_mitad_derecha = ANCHO // 2 + ANCHO // 4  # x = 960
+        rect_imagen = imagen_ganador.get_rect(center=(centro_mitad_derecha, centro[1]))
         pantalla.blit(imagen_ganador, rect_imagen)
         
-        # GIF de victoria justo al lado de la imagen
+        # GIF de victoria posicionado en la mitad derecha de la pantalla
         try:
             nombre_archivo = f'imagenes/gifs/{ganador_actual.lower().replace(" ", "_")}_win.gif'
             if ganador_actual not in gifs_victoria:
@@ -485,64 +487,73 @@ while ejecutando:
                 gifs_victoria[ganador_actual] = AnimatedGIF(nombre_archivo, velocidad)
             frame_victoria = gifs_victoria[ganador_actual].get_next_frame()
             
+            # Base position dentro de la mitad derecha (x entre 640 y 1280)
+            # Posicionar el GIF ligeramente a la derecha de la imagen ganadora
+            posicion_base_x = centro_mitad_derecha + 120  # 120 píxeles a la derecha de la imagen
+            
             # Ajustar posición específicamente para ciertos juegos
-            posicion_x = ANCHO // 2 + ANCHO // 4
             if ganador_actual == "Mortal Kombat 2":
-                posicion_x = ANCHO // 2 + 502  # 10% más a la izquierda que antes
+                posicion_x = posicion_base_x - 50  # Ligeramente más a la izquierda
                 # Obtener el tamaño original y agrandarlo 2.25 veces
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 2.25)  # 2.25 veces más grande
                 nuevo_alto = int(alto_original * 2.25)    # 2.25 veces más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Pokemon":
-                posicion_x = ANCHO // 2 + 434  # 40% más a la derecha
+                posicion_x = posicion_base_x + 20
                 # Obtener el tamaño original (tamaño normal)
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 1.0)  # Tamaño original
                 nuevo_alto = int(alto_original * 1.0)    # Tamaño original
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Battletoads":
-                posicion_x = ANCHO // 2 + 463  # 15% más a la derecha
+                posicion_x = posicion_base_x + 10
                 # Obtener el tamaño original y agrandarlo 50%
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 1.5)  # 50% más grande
                 nuevo_alto = int(alto_original * 1.5)    # 50% más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Street Fighter 2":
-                posicion_x = ANCHO // 2 + 434  # 40% más a la derecha
+                posicion_x = posicion_base_x + 20
                 # Obtener el tamaño original y agrandarlo 4 veces
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 4.0)  # 4 veces más grande
                 nuevo_alto = int(alto_original * 4.0)    # 4 veces más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "The Simpsons":
-                posicion_x = ANCHO // 2 + 434  # 10% más a la derecha
+                posicion_x = posicion_base_x + 20
                 # Obtener el tamaño original y duplicarlo
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 2.0)  # Duplicar el tamaño
                 nuevo_alto = int(alto_original * 2.0)    # Duplicar el tamaño
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Mario Bros":
-                posicion_x = ANCHO // 2 + 403  # 30% más a la derecha
+                posicion_x = posicion_base_x
                 # Obtener el tamaño original y aumentarlo 30%
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 1.3)  # 30% más grande
                 nuevo_alto = int(alto_original * 1.3)    # 30% más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Super Tennis":
-                posicion_x = ANCHO // 2 + 447  # 10% más a la derecha
+                posicion_x = posicion_base_x + 30
                 # Obtener el tamaño original y agrandarlo 2 veces
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 2.0)  # 2 veces más grande
                 nuevo_alto = int(alto_original * 2.0)    # 2 veces más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
             elif ganador_actual == "Megaman":
-                posicion_x = ANCHO // 2 + 523  # 30% más a la derecha
+                posicion_x = posicion_base_x + 60
                 # Obtener el tamaño original y agrandarlo 300%
                 ancho_original, alto_original = frame_victoria.get_size()
                 nuevo_ancho = int(ancho_original * 3.0)  # 300% más grande
                 nuevo_alto = int(alto_original * 3.0)    # 300% más grande
                 frame_victoria = pygame.transform.scale(frame_victoria, (nuevo_ancho, nuevo_alto))
+            else:
+                posicion_x = posicion_base_x
+            
+            # Asegurar que el GIF no se salga de la mitad derecha de la pantalla
+            if posicion_x > ANCHO - 100:  # Dejar margen de 100px del borde
+                posicion_x = ANCHO - 100
             
             rect_gif = frame_victoria.get_rect(center=(posicion_x, centro[1]))
             pantalla.blit(frame_victoria, rect_gif)
