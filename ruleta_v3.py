@@ -66,14 +66,16 @@ opciones_usadas = []
 def recargar_imagenes():
     global imagenes
     imagenes = []
+    # Obtener el directorio del script actual
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
     for opcion in opciones_disponibles:
         try:
-            ruta = os.path.join('imagenes', f'{opcion}.png')
-            ruta_absoluta = os.path.abspath(ruta)
-            print(f"Buscando imagen: {ruta_absoluta}")
-            if os.path.exists(ruta_absoluta):
-                print(f"Imagen encontrada: {ruta_absoluta}")
-                imagen = pygame.image.load(ruta_absoluta)
+            ruta = os.path.join(script_dir, 'imagenes', f'{opcion}.png')
+            print(f"Buscando imagen: {ruta}")
+            if os.path.exists(ruta):
+                print(f"Imagen encontrada: {ruta}")
+                imagen = pygame.image.load(ruta)
                 ancho_original, alto_original = imagen.get_size()
                 tamano_ajustado = TAMANO_IMAGEN
                 if opcion in ["Mortal Kombat 2", "Super Tennis"]:
@@ -100,12 +102,12 @@ def recargar_imagenes():
 recargar_imagenes()
 
 # Cargar fondo
-ruta_video = os.path.join('imagenes', 'fondo.mp4')
-ruta_video_abs = os.path.abspath(ruta_video)
-print(f"Buscando video de fondo: {ruta_video_abs}")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+ruta_video = os.path.join(script_dir, 'imagenes', 'fondo.mp4')
+print(f"Buscando video de fondo: {ruta_video}")
 try:
-    if os.path.exists(ruta_video_abs):
-        video_fondo = cv2.VideoCapture(ruta_video_abs)
+    if os.path.exists(ruta_video):
+        video_fondo = cv2.VideoCapture(ruta_video)
         ret, frame = video_fondo.read()
         if ret:
             altura, ancho = frame.shape[:2]
@@ -176,14 +178,13 @@ class AnimatedGIF:
         return self.static_frame
 
 # Cargar GIF del centro
-ruta_gif_centro = os.path.join('imagenes', 'gifs', 'centro.gif')
-ruta_gif_centro_abs = os.path.abspath(ruta_gif_centro)
-print(f"Buscando GIF del centro: {ruta_gif_centro_abs}")
+ruta_gif_centro = os.path.join(script_dir, 'imagenes', 'gifs', 'centro.gif')
+print(f"Buscando GIF del centro: {ruta_gif_centro}")
 try:
-    if os.path.exists(ruta_gif_centro_abs):
-        gif_centro = AnimatedGIF(ruta_gif_centro_abs, tamano_maximo=200)  # Tamaño máximo de 200px
+    if os.path.exists(ruta_gif_centro):
+        gif_centro = AnimatedGIF(ruta_gif_centro, tamano_maximo=200)  # Tamaño máximo de 200px
     else:
-        print(f"GIF centro.gif NO encontrado: {ruta_gif_centro_abs}")
+        print(f"GIF centro.gif NO encontrado: {ruta_gif_centro}")
         gif_centro = None
 except Exception as e:
     print(f"Error al cargar el GIF del centro: {e}")
@@ -191,8 +192,8 @@ except Exception as e:
 
 # Cargar sonidos
 try:
-    sonido_giro = pygame.mixer.Sound('sonidos/giro.wav')
-    sonido_win = pygame.mixer.Sound('sonidos/win.wav')
+    sonido_giro = pygame.mixer.Sound(os.path.join(script_dir, 'sonidos', 'giro.wav'))
+    sonido_win = pygame.mixer.Sound(os.path.join(script_dir, 'sonidos', 'win.wav'))
 except:
     sonido_giro = None
     sonido_win = None
@@ -201,7 +202,7 @@ except:
 sonidos_victoria = {}
 for opcion in opciones_disponibles:
     try:
-        ruta = f'sonidos/{opcion.lower().replace(" ", "_")}_win.wav'
+        ruta = os.path.join(script_dir, 'sonidos', f'{opcion.lower().replace(" ", "_")}_win.wav')
         sonidos_victoria[opcion] = pygame.mixer.Sound(ruta)
     except:
         pass
@@ -217,14 +218,14 @@ normalized_height = ANCHO // 10
 
 # Cargar flecha
 try:
-    flecha = pygame.image.load('imagenes/Flecha.png')
+    flecha = pygame.image.load(os.path.join(script_dir, 'imagenes', 'Flecha.png'))
     flecha = pygame.transform.scale(flecha, (120, 96))  # Aumentado proporcionalmente
 except:
     flecha = None
 
 # Cargar logo de Megaman Megamix
 try:
-    logo_megamix = pygame.image.load('imagenes/Megaband Logo.png')
+    logo_megamix = pygame.image.load(os.path.join(script_dir, 'imagenes', 'Megaband Logo.png'))
     # Obtener las dimensiones originales
     ancho_original, alto_original = logo_megamix.get_size()
     # Calcular el factor de escala para mantener proporciones (máximo 600px de ancho) y agrandarlo 10%
@@ -481,7 +482,7 @@ while ejecutando:
         
         # GIF de victoria posicionado en la mitad derecha de la pantalla
         try:
-            nombre_archivo = f'imagenes/gifs/{ganador_actual.lower().replace(" ", "_")}_win.gif'
+            nombre_archivo = os.path.join(script_dir, 'imagenes', 'gifs', f'{ganador_actual.lower().replace(" ", "_")}_win.gif')
             if ganador_actual not in gifs_victoria:
                 velocidad = 2.0 if ganador_actual == "Donkey Kong" else 1.0  # Mitad de velocidad
                 gifs_victoria[ganador_actual] = AnimatedGIF(nombre_archivo, velocidad)
