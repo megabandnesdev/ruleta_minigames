@@ -14,11 +14,48 @@ pygame.init()
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Setup display
-pantalla = pygame.display.set_mode((ANCHO, ALTO), pygame.FULLSCREEN)
+
+# Get information about all connected displays
+desktop_sizes = pygame.display.get_desktop_sizes()
+print(f"Detected displays: {desktop_sizes}")
+
+target_display_index = 0 # Default to primary display
+
+# If there's more than one monitor, try to use the second one (index 1)
+if len(desktop_sizes) > 1:
+    target_display_index = 1
+    print(f"Attempting to use external display (index {target_display_index}).")
+else:
+    print("Only one display detected. Using the primary display.")
+
+# Get the resolution of the target display
+# screen_width, screen_height = desktop_sizes[target_display_index]
+
+modo_pantalla_completa = False
+
+try:
+    # Set the display mode to fullscreen on the chosen monitor
+    if modo_pantalla_completa:
+        pantalla = pygame.display.set_mode((ANCHO, ALTO),pygame.FULLSCREEN, display=target_display_index)
+    else:
+        pantalla = pygame.display.set_mode((ANCHO, ALTO), display=target_display_index)
+    pygame.display.set_caption(f"Pygame on Display {target_display_index}")
+    print(f"Successfully set display on monitor {target_display_index}.")
+except pygame.error as e:
+    print(f"Error setting display mode: {e}")
+    print("Falling back to default display.")
+    if modo_pantalla_completa:
+        pantalla = pygame.display.set_mode((ANCHO, ALTO),pygame.FULLSCREEN, display=0)
+    else:
+        pantalla = pygame.display.set_mode((ANCHO, ALTO), display=0)
+
+    pygame.display.set_caption("Pygame on Default Display (Fallback)")
+
+
 pygame.display.set_caption("Ruleta Retro")
 
 # Initialize game components
-game_state = GameState(script_dir, OPCIONES)
+game_state = GameState(script_dir, opciones_iniciales=OPCIONES,singleplayer_options=SINGLEPLAYER_OPTIONS,multiplayer_options= MULTIPLAYER_OPTIONS)
 asset_manager = AssetManager(script_dir, game_state.opciones_disponibles)
 centro = (ANCHO // 2, int(ALTO * 0.55))
 roulette = Roulette(asset_manager, centro, RADIO_BASE)
@@ -34,7 +71,6 @@ tiempo_ganador = 0
 ganador_actual = None
 ultima_pulsacion_espacio = 0
 esperando_espacio_para_salir = False
-modo_pantalla_completa = True
 
 def cambiar_modo_pantalla():
     global pantalla, modo_pantalla_completa
