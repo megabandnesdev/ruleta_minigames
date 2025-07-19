@@ -17,7 +17,23 @@ OPCIONES = [
     "Pokemon",
     "The Simpsons"
 ]
-
+SINGLEPLAYER_OPTIONS = [
+    "MM1 Bomb Man",
+    "MM2 Metal Man",
+    "MM3 Top Man",
+    "MM4 Toad Man",
+    "MM5 Star Man",
+    "MM6 Flame Man",
+]
+MULTIPLAYER_OPTIONS = [
+    "Mortal Kombat 2",
+    "Mario Bros",
+    "Street Fighter 2",
+    "Battletoads",
+    "Super Tennis",
+    "The Simpsons",
+    "Megaman VS"
+]
 # Timing constants
 TIEMPO_MOSTRAR_RESULTADO = 6000
 TIEMPO_ESPERA = 5000
