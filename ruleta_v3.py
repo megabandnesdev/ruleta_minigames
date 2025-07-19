@@ -317,6 +317,11 @@ while ejecutando:
                     mostrar_resultado = False
                     esperando_espacio_para_salir = False
                     if esperando_reduccion:
+                        # Detener sonidos de victoria antes de que la ruleta esté lista para girar de nuevo
+                        if ganador_actual in sonidos_victoria:
+                            sonidos_victoria[ganador_actual].stop()
+                        if sonido_win:
+                            sonido_win.stop()
                         opciones_usadas.append(ganador_actual)
                         opciones_disponibles.remove(ganador_actual)
                         esperando_reduccion = False
@@ -329,6 +334,11 @@ while ejecutando:
                     mostrar_resultado = False
                     esperando_espacio_para_salir = False
                     if esperando_reduccion:
+                        # Detener sonidos de victoria antes de que la ruleta esté lista para girar de nuevo
+                        if ganador_actual in sonidos_victoria:
+                            sonidos_victoria[ganador_actual].stop()
+                        if sonido_win:
+                            sonido_win.stop()
                         opciones_usadas.append(ganador_actual)
                         opciones_disponibles.remove(ganador_actual)
                         esperando_reduccion = False
