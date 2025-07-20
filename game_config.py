@@ -18,10 +18,24 @@ OPCIONES = [
     "The Simpsons"
 ]
 
+# Single player mode options - 6 different alternatives
+SINGLEPLAYER_OPTIONS = [
+    "Adventure Mode",
+    "Time Attack",
+    "Survival Mode", 
+    "Puzzle Challenge",
+    "Boss Rush",
+    "Training Mode"
+]
+
 # Timing constants
 TIEMPO_MOSTRAR_RESULTADO = 6000
 TIEMPO_ESPERA = 5000
 TIEMPO_DOBLE_PULSACION = 500
+
+# Single player selection timing
+TIEMPO_SELECCION_SINGLEPLAYER = 5000  # 5 seconds for random selection
+TIEMPO_MOSTRAR_OPCION = 200  # Time to show each option during cycling
 
 # Image settings
 TAMANO_IMAGEN = 180
