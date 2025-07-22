@@ -68,6 +68,8 @@ class SinglePlayerSelector:
             self.start_time = pygame.time.get_ticks()
             self.last_highlight_change = self.start_time
             self.selected_option = None
+            # Update background to match initial selection
+            self.update_background(None, self.current_highlighted)
             print("Single player selection started!")
             
     def update(self):
@@ -91,8 +93,8 @@ class SinglePlayerSelector:
         if current_time - self.last_highlight_change >= TIEMPO_MOSTRAR_OPCION:
             self.current_highlighted = (self.current_highlighted + 1) % len(self.options)
             self.last_highlight_change = current_time
-            
-
+            # Update background according to current selection
+            self.update_background(None, self.current_highlighted)
             
         return None
         
