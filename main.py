@@ -6,6 +6,7 @@ from asset_manager import AssetManager
 from roulette import Roulette
 from winner_display import WinnerDisplay
 from game_state import GameState
+from singleplayer_selector import SinglePlayerSelector
 
 # Initialize Pygame
 pygame.init()
@@ -59,6 +60,7 @@ game_state = GameState(script_dir, opciones_iniciales=OPCIONES,singleplayer_opti
 asset_manager = AssetManager(script_dir, game_state.opciones_disponibles)
 centro = (ANCHO // 2, int(ALTO * 0.55))
 roulette = Roulette(asset_manager, centro, RADIO_BASE)
+singleplayer_selector = SinglePlayerSelector(asset_manager, centro)
 fuente = pygame.font.Font(None, 96)
 winner_display = WinnerDisplay(asset_manager, fuente)
 
@@ -82,6 +84,32 @@ def cambiar_modo_pantalla():
         pantalla = pygame.display.set_mode((ANCHO, ALTO))
         print("Cambiado a modo ventana")
 
+def reset_current_game():
+    """Reset the current game mode"""
+    global mostrar_resultado, esperando_reduccion, ganador_actual
+    
+    if game_state.is_roulette_mode():
+        print("Reset de la ruleta")
+        game_state.reset_game()
+        asset_manager.reload_images(game_state.opciones_disponibles)
+        roulette.girando = False
+        roulette.angulo = 0
+        roulette.velocidad = 0
+    elif game_state.is_singleplayer_mode():
+        print("Reset del selector single player")
+        singleplayer_selector.reset()
+    
+    # Reset common variables
+    mostrar_resultado = False
+    esperando_reduccion = False
+    ganador_actual = None
+
+def switch_game_mode():
+    """Switch between roulette and single player modes"""
+    game_state.switch_mode()
+    reset_current_game()
+    print(f"Cambiado a modo: {game_state.get_current_mode()}")
+
 # Main game loop
 reloj = pygame.time.Clock()
 ejecutando = True
@@ -94,80 +122,116 @@ while ejecutando:
         elif evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_ESCAPE:
                 cambiar_modo_pantalla()
+            elif evento.key == pygame.K_m:
+                # Switch game mode with 'M' key
+                switch_game_mode()
             elif evento.key == pygame.K_r:
-                # Reset game
-                print("Reset de la ruleta")
-                game_state.reset_game()
-                asset_manager.reload_images(game_state.opciones_disponibles)
-                roulette.girando = False
-                mostrar_resultado = False
-                esperando_reduccion = False
-                ganador_actual = None
-                roulette.angulo = 0
-                roulette.velocidad = 0
+                # Reset current game
+                reset_current_game()
             elif evento.key == pygame.K_SPACE:
                 tiempo_actual = pygame.time.get_ticks()
-                if roulette.girando and tiempo_actual - ultima_pulsacion_espacio < TIEMPO_DOBLE_PULSACION:
-                    # Double press detected during spin, force stop
-                    roulette.force_stop()
-                elif mostrar_resultado and tiempo_actual - ultima_pulsacion_espacio < TIEMPO_DOBLE_PULSACION:
-                    # Double press detected during result, skip to wait
-                    mostrar_resultado = False
-                    esperando_espacio_para_salir = False
-                    if esperando_reduccion:
-                        roulette.asset_manager.stop_victory_sound()
-                        game_state.remove_winner(ganador_actual)
-                        asset_manager.reload_images(game_state.opciones_disponibles)
-                        esperando_reduccion = False
-                        ganador_actual = None
-                elif mostrar_resultado:
-                    # Single press during result, exit victory scene
-                    mostrar_resultado = False
-                    esperando_espacio_para_salir = False
-                    if esperando_reduccion:
-                        roulette.asset_manager.stop_victory_sound()
-                        game_state.remove_winner(ganador_actual)
-                        asset_manager.reload_images(game_state.opciones_disponibles)
-                        esperando_reduccion = False
-                        ganador_actual = None
-                elif not roulette.girando and not esperando_reduccion and len(game_state.opciones_disponibles) > 0:
-                    roulette.start_spin()
+                if game_state.is_roulette_mode():
+                    # Handle roulette mode space key
+                    if roulette.girando and tiempo_actual - ultima_pulsacion_espacio < TIEMPO_DOBLE_PULSACION:
+                        # Double press detected during spin, force stop
+                        roulette.force_stop()
+                    elif mostrar_resultado and tiempo_actual - ultima_pulsacion_espacio < TIEMPO_DOBLE_PULSACION:
+                        # Double press detected during result, skip to wait
+                        mostrar_resultado = False
+                        esperando_espacio_para_salir = False
+                        if esperando_reduccion:
+                            roulette.asset_manager.stop_victory_sound()
+                            game_state.remove_winner(ganador_actual)
+                            asset_manager.reload_images(game_state.opciones_disponibles)
+                            esperando_reduccion = False
+                            ganador_actual = None
+                    elif mostrar_resultado:
+                        # Single press during result, exit victory scene
+                        mostrar_resultado = False
+                        esperando_espacio_para_salir = False
+                        if esperando_reduccion:
+                            roulette.asset_manager.stop_victory_sound()
+                            game_state.remove_winner(ganador_actual)
+                            asset_manager.reload_images(game_state.opciones_disponibles)
+                            esperando_reduccion = False
+                            ganador_actual = None
+                    elif not roulette.girando and not esperando_reduccion and len(game_state.opciones_disponibles) > 0:
+                        roulette.start_spin()
+                        
+                elif game_state.is_singleplayer_mode():
+                    # Handle single player mode space key
+                    if not singleplayer_selector.selecting and not singleplayer_selector.is_selection_complete():
+                        # Start selection process
+                        singleplayer_selector.start_selection()
+                    elif singleplayer_selector.is_selection_complete():
+                        # Continue after selection or reset
+                        if tiempo_actual - ultima_pulsacion_espacio < TIEMPO_DOBLE_PULSACION:
+                            # Double press - reset selection
+                            singleplayer_selector.reset()
+                        else:
+                            # Single press - could be used to continue to next phase
+                            print(f"Continuing with selected mode: {singleplayer_selector.get_selected_option()}")
+                
                 ultima_pulsacion_espacio = tiempo_actual
     
-    # Update roulette
-    winner = roulette.update()
-    if winner:
-        ganador_actual = winner
-        resultado = f"{ganador_actual.upper()}"
-        esperando_reduccion = True
-        tiempo_ganador = pygame.time.get_ticks()
-        mostrar_resultado = True
-        tiempo_resultado = tiempo_ganador
+    # Update current game mode
+    if game_state.is_roulette_mode():
+        # Update roulette
+        winner = roulette.update()
+        if winner:
+            ganador_actual = winner
+            resultado = f"{ganador_actual.upper()}"
+            esperando_reduccion = True
+            tiempo_ganador = pygame.time.get_ticks()
+            mostrar_resultado = True
+            tiempo_resultado = tiempo_ganador
     
+    elif game_state.is_singleplayer_mode():
+        # Update single player selector
+        selected_option = singleplayer_selector.update()
+        if selected_option:
+            ganador_actual = selected_option
+            resultado = f"{ganador_actual.upper()}"
+            # No need for esperando_reduccion in single player mode
+            tiempo_ganador = pygame.time.get_ticks()
+            mostrar_resultado = True
+            tiempo_resultado = tiempo_ganador
+
     # Draw everything
-    if asset_manager.video_fondo and roulette.girando:
-        background, pos = asset_manager.get_next_background_frame()
-        pantalla.blit(background, pos)
-    else:
-        pantalla.blit(asset_manager.fondo_estatico, (0, 0))
+    if game_state.is_roulette_mode():
+        # Draw roulette mode
+        if asset_manager.video_fondo and roulette.girando:
+            background, pos = asset_manager.get_next_background_frame()
+            pantalla.blit(background, pos)
+        else:
+            pantalla.blit(asset_manager.fondo_estatico, (0, 0))
+        
+        # Draw title and logo
+        fuente_titulo = pygame.font.Font(None, 72)
+        texto_titulo = fuente_titulo.render("MEGAMIX - ROULETTE", True, NEGRO)
+        rect_titulo = texto_titulo.get_rect(center=(ANCHO // 2, 50))
+        pantalla.blit(texto_titulo, rect_titulo)
+        
+        if asset_manager.logo_megamix:
+            pantalla.blit(asset_manager.logo_megamix, (20, 20))
+        
+        # Draw roulette
+        if len(game_state.opciones_disponibles) > 0:
+            roulette.draw(pantalla)
+            
+    elif game_state.is_singleplayer_mode():
+        # Draw single player mode
+        singleplayer_selector.draw(pantalla)
     
-    # Draw title and logo
-    fuente_titulo = pygame.font.Font(None, 72)
-    texto_titulo = fuente_titulo.render("MEGAMIX", True, NEGRO)
-    rect_titulo = texto_titulo.get_rect(center=(ANCHO // 2, 50))
-    pantalla.blit(texto_titulo, rect_titulo)
-    
-    if asset_manager.logo_megamix:
-        pantalla.blit(asset_manager.logo_megamix, (20, 20))
-    
-    # Draw roulette
-    if len(game_state.opciones_disponibles) > 0:
-        roulette.draw(pantalla)
-    
-    # Draw winner scene if needed
-    if mostrar_resultado:
+    # Draw winner scene if needed (common for both modes)
+    if mostrar_resultado and game_state.is_roulette_mode():
         winner_display.draw_winner_scene(pantalla, ganador_actual, resultado, centro)
     
+    # Draw mode switching instructions
+    fuente_pequena = pygame.font.Font(None, 36)
+    mode_text = fuente_pequena.render(f"Mode: {game_state.get_current_mode().upper()} | Press M to switch | Press R to reset", True, BLANCO)
+    pantalla.blit(mode_text, (10, ALTO - 30))
+
     pygame.display.flip()
     reloj.tick(60)
 

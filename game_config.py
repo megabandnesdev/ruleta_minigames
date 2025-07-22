@@ -13,8 +13,6 @@ OPCIONES = [
     "Street Fighter 2",
     "Battletoads",
     "Super Tennis",
-    "Megaman",
-    "Pokemon",
     "The Simpsons"
 ]
 SINGLEPLAYER_OPTIONS = [
@@ -41,6 +39,11 @@ TIEMPO_DOBLE_PULSACION = 500
 
 # Image settings
 TAMANO_IMAGEN = 180
+
+# Single player selection timing
+TIEMPO_SELECCION_SINGLEPLAYER = 5000  # 5 seconds for random selection
+TIEMPO_MOSTRAR_OPCION = 200  # Time to show each option during cycling
+
 
 # Roulette settings
 RADIO_BASE = ANCHO // 4
