@@ -22,7 +22,7 @@ class SpriteAnimation:
     
     def get_specific_frame(self,index):
         try: 
-            return self.spriteframes[self.frame_index]
+            return self.spriteframes[index]
         except:
             return self.spriteframes[0]
     def get_animation_frames(self, start_x, start_y, frame_width, frame_height, num_frames, orientation='horizontal', padding=0):
