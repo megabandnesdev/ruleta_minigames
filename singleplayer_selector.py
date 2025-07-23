@@ -68,6 +68,8 @@ class SinglePlayerSelector:
             self.start_time = pygame.time.get_ticks()
             self.last_highlight_change = self.start_time
             self.selected_option = None
+            #Update background to match initial selection
+            self.update_background(None,self.current_highlighted)
             print("Single player selection started!")
             
     def update(self):
@@ -91,7 +93,8 @@ class SinglePlayerSelector:
         if current_time - self.last_highlight_change >= TIEMPO_MOSTRAR_OPCION:
             self.current_highlighted = (self.current_highlighted + 1) % len(self.options)
             self.last_highlight_change = current_time
-            
+            #Update background to match current selection
+            self.update_background(None,self.current_highlighted)
 
             
         return None
@@ -99,7 +102,7 @@ class SinglePlayerSelector:
     def draw(self, screen):
         """Draw the single player selection interface"""
         # Draw background
-        screen.blit(self.background_spritesheet, (0, 0))
+        screen.blit(self.bg_animation.get_current_frame(), (0, 0))
         
         # Draw title
         font_large = pygame.font.Font(None, 96)
@@ -137,7 +140,7 @@ class SinglePlayerSelector:
                 pygame.draw.rect(screen, BLANCO, option_rect, 2)  # White border
                 
             # Draw option text
-            self.bg_animation.get_next_frame()
+            
             text_surface = font_medium.render(option, True, BLANCO)
             text_rect = text_surface.get_rect(center=option_rect.center)
             screen.blit(text_surface, text_rect)
@@ -167,6 +170,8 @@ class SinglePlayerSelector:
         self.selected_option = None
         self.current_highlighted = 0
         self.selection_complete = False
+
+        self.update_background(None,0)
         print("Single player selector reset")
         
     def is_selection_complete(self):

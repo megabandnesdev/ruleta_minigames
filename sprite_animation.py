@@ -11,14 +11,14 @@ class SpriteAnimation:
 
     def get_current_frame(self):
         try: 
-            return self.spriteframe[self.frame_index]
+            return self.spriteframes[self.frame_index]
         except:
-            return self.spriteframe[0]
+            return self.spriteframes[0]
     def get_next_frame(self):
-        self.frame_index =+ 1 
-        if self.spriteframes.length()>self.frame_index:
+        self.frame_index += 1 
+        if len(self.spriteframes)<=self.frame_index:
             self.frame_index=0
-        return self.get_frame()
+        return self.get_current_frame()
     
     def get_specific_frame(self,index):
         try: 
