@@ -45,7 +45,8 @@ class SinglePlayerSelector:
             )
             #self.background_spritesheet = pygame.image.load(sprite_path)
             self.spritesheet = SpriteSheet(sprite_path)
-            self.bg_animation = SpriteAnimation ( self.spritesheet, self.spritesheet.get_animation_frames(1280, 0, 1280, 720, 6))
+            frames = self.spritesheet.get_animation_frames(0, 0, 1280, 720, 6)
+            self.bg_animation = SpriteAnimation(self.spritesheet, frames)
             self.background_spritesheet = self.spritesheet.get_sprite(0,0,1280,720)
             self.background_spritesheet = pygame.transform.scale(
                 self.background_spritesheet, (1280, 720)
@@ -55,10 +56,11 @@ class SinglePlayerSelector:
             self.background_spritesheet = pygame.Surface((1280, 720))
             # self.background_spritesheet.fill((50, 50, 100))  # Dark blue background
     def update_background(self,screen,index):
-
         #self.background_spritesheet = pygame.image.load(sprite_path)
         
-        self.background_spritesheet = self.bg_animation.get_specific_frame(index)
+        frame = self.bg_animation.get_specific_frame(index)
+        if frame:
+            self.background_spritesheet = pygame.transform.scale(frame, (1280, 720))
 
     def start_selection(self):
         """Start the single player option selection process"""

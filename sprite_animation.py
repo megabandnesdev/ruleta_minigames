@@ -11,9 +11,9 @@ class SpriteAnimation:
 
     def get_current_frame(self):
         try: 
-            return self.spriteframe[self.frame_index]
+            return self.spriteframes[self.frame_index]
         except:
-            return self.spriteframe[0]
+            return self.spriteframes[0]
     def get_next_frame(self):
         self.frame_index += 1 
         if len(self.spriteframes) <= self.frame_index:
@@ -22,9 +22,12 @@ class SpriteAnimation:
     
     def get_specific_frame(self,index):
         try: 
-            return self.spriteframes[index]
+            if 0 <= index < len(self.spriteframes):
+                return self.spriteframes[index]
+            else:
+                return self.spriteframes[0]
         except:
-            return self.spriteframes[0]
+            return self.spriteframes[0] if self.spriteframes else None
     def get_animation_frames(self, start_x, start_y, frame_width, frame_height, num_frames, orientation='horizontal', padding=0):
         """
         Extracts a sequence of animation frames from the spritesheet.
